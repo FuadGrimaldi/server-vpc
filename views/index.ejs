@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>User Profile</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      .profile {
+        max-width: 500px;
+        margin: auto;
+        border: 1px solid #ccc;
+        border-radius: 10px;
+        padding: 20px;
+      }
+      .profile h2 {
+        text-align: center;
+      }
+      .profile p {
+        margin: 8px 0;
+      }
+      .label {
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="profile" id="profile">
+      <h2>Loading Profile...</h2>
+    </div>
+
+    <script>
+      const token =
+        "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vbG9jYWxob3N0OjgwMDAvYXBpL2xvZ2luIiwiaWF0IjoxNzQ2Mjk4MTg3LCJleHAiOjE3NDYzMDE3ODcsIm5iZiI6MTc0NjI5ODE4NywianRpIjoiSWIwVzhkQVlHaTVON0tUaiIsInN1YiI6IjEiLCJwcnYiOiIyM2JkNWM4OTQ5ZjYwMGFkYjM5ZTcwMWM0MDA4NzJkYjdhNTk3NmY3In0.3jTeKX5R4qfy-n-__KNLeF6VnZst0taLFHmmRwhT-uY";
+
+      async function loadUserProfile() {
+        try {
+          const response = await fetch(
+            "http://127.0.0.1:8000/api/user/profile",
+            {
+              method: "GET",
+              headers: {
+                Authorization: "Bearer " + token,
+                Accept: "application/json",
+              },
+            }
+          );
+
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+
+          const result = await response.json();
+          const data = result.data;
+
+          const profileDiv = document.getElementById("profile");
+          profileDiv.innerHTML = `
+                        <h2>User Profile</h2>
+                        <p><span class="label">Name:</span> ${data.name}</p>
+                        <p><span class="label">Username:</span> ${
+                          data.username
+                        }</p>
+                        <p><span class="label">Email:</span> ${data.email}</p>
+                        <p><span class="label">Verified:</span> ${
+                          data.verified ? "Yes" : "No"
+                        }</p>
+                        <p><span class="label">Card Number:</span> ${
+                          data.wallet.card_number
+                        }</p>
+                        <p><span class="label">Balance:</span> Rp ${data.wallet.balance.toLocaleString()}</p>
+                        <p><span class="label">Created At:</span> ${
+                          data.created_at
+                        }</p>
+                        <p><span class="label">Updated At:</span> ${
+                          data.updated_at
+                        }</p>
+                    `;
+        } catch (error) {
+          document.getElementById("profile").innerHTML =
+            "<h2>Failed to load profile</h2>";
+          console.error("Error:", error);
+        }
+      }
+
+      // Panggil hanya sekali saat halaman selesai dimuat
+      window.addEventListener("DOMContentLoaded", () => {
+        loadUserProfile();
+      });
+    </script>
+  </body>
+</html>
